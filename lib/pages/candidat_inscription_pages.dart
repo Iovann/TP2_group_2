@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:candidat/common/input.dart';
 import 'package:candidat/models/candidat.dart';
 import 'package:flutter/material.dart';
-
+import 'package:http/http.dart' as http;
+import 'dart:convert' as convert;
 import '../common/button.dart';
 
 class candidat_inscription extends StatefulWidget {
@@ -72,8 +75,6 @@ class _candidat_inscriptionState extends State<candidat_inscription> {
                   }
                 },
                 onSaved: (value) {
-
-                  print("Valeur à sauvegarder $value");
                   candidat.description=value;
 
                 },
@@ -107,16 +108,41 @@ class _candidat_inscriptionState extends State<candidat_inscription> {
       ),
       bottomNavigationBar: BottomAppBar(
         child:  Button(
-          onPressed: () {
-            if(  _formKey.currentState!.validate()){
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Inscription Complète'),
-                  duration: Duration(seconds: 1),
-                ),
+          onPressed: () async {
+            var url = Uri.https('jsonplaceholder.typicode.com', '/users');
+            var envoi = convert.jsonEncode(candidat.toJson());
+
+            try {
+              var response = await http.post(url, body: envoi);
+              print(response["sucess"]);
+              if (response.statusCode >= 200 && response.statusCode <= 299) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Inscription Complète'),
+                    duration: Duration(seconds: 1),
+                  ),
+                );
+                _formKey.currentState!.save();
+                Navigator.pop(context, candidat);
+              }
+            }catch (error) {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: Text('Erreur d\'inscription'),
+                    content: Text('Veuillez vérifier votre connexion internet et réessayer.'),
+                    actions: <Widget>[
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: Text('OK'),
+                      ),
+                    ],
+                  );
+                },
               );
-              _formKey.currentState!.save();
-              Navigator.pop(context, candidat);
             }
           },
           text: "S'inscrire",
