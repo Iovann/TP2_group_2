@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:candidat/common/input.dart';
 import 'package:candidat/models/candidat.dart';
 import 'package:flutter/material.dart';
@@ -112,37 +110,40 @@ class _candidat_inscriptionState extends State<candidat_inscription> {
             var url = Uri.https('jsonplaceholder.typicode.com', '/users');
             var envoi = convert.jsonEncode(candidat.toJson());
 
-            try {
-              var response = await http.post(url, body: envoi);
-              print(response["sucess"]);
-              if (response.statusCode >= 200 && response.statusCode <= 299) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Inscription Complète'),
-                    duration: Duration(seconds: 1),
-                  ),
-                );
-                _formKey.currentState!.save();
-                Navigator.pop(context, candidat);
-              }
-            }catch (error) {
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: Text('Erreur d\'inscription'),
-                    content: Text('Veuillez vérifier votre connexion internet et réessayer.'),
-                    actions: <Widget>[
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: Text('OK'),
-                      ),
-                    ],
+            if(_formKey.currentState!.validate()){
+              try {
+                var response = await http.post(url, body: envoi);
+                if (response.statusCode >= 200 && response.statusCode <= 299) {
+                  print(response.statusCode);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Inscription Complète'),
+                      duration: Duration(seconds: 1),
+                    ),
                   );
-                },
-              );
+                  _formKey.currentState!.save();
+                  _formKey.currentState!.save();
+                  Navigator.pop(context, candidat);
+                }
+              }catch (error) {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Text('Erreur d\'inscription'),
+                      content: Text('Veuillez vérifier votre connexion internet et réessayer.'),
+                      actions: <Widget>[
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: Text('OK'),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              }
             }
           },
           text: "S'inscrire",

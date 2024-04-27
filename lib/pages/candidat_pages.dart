@@ -32,7 +32,7 @@ class _presentationState extends State<presentation> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                   Column(
-                    children: [Text("Candidates", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15))],
+                    children: [Text("Candidats", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15))],
                   ),
                 Column(
                   children: [Text("${candidats.length}")],
